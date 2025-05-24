@@ -1,0 +1,3787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mustard Clicker Deluxe</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            background-color: #FFFACD;
+            color: #8B4513;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+            transition: background-color 1s;
+        }
+        
+        #game-wrapper {
+            display: flex;
+            justify-content: center;
+            transition: padding-right 0.3s;
+        }
+        
+        #game-container {
+            max-width: 600px;
+            background-color: #FFFFE0;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px #DAA520;
+            border: 3px solid #DAA520;
+            position: relative;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+        
+        h1 {
+            color: #DAA520;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 5px;
+        }
+        
+        #subtitle {
+            font-style: italic;
+            color: #B8860B;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        
+        #mustard-jar {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            background-color: #FFD700;
+            border-radius: 50% 50% 40% 40%;
+            border: 10px solid #B8860B;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.1s;
+            z-index: 10;
+            box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.3);
+        }
+        
+        #mustard-jar.rainbow {
+            animation: rainbowBorder 0.5s linear infinite;
+            background: linear-gradient(45deg, #ff0000, #ff9900, #ffff00, #33cc33, #0099ff, #6633ff, #cc33ff);
+            background-size: 400% 400%;
+            animation: rainbowBackground 2s linear infinite;
+        }
+        
+        @keyframes rainbowBackground {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        
+        @keyframes rainbowBorder {
+            0% { border-color: #ff0000; }
+            14% { border-color: #ff9900; }
+            28% { border-color: #ffff00; }
+            42% { border-color: #33cc33; }
+            57% { border-color: #0099ff; }
+            71% { border-color: #6633ff; }
+            85% { border-color: #cc33ff; }
+            100% { border-color: #ff0000; }
+        }
+        
+        #mustard-jar:active {
+            transform: scale(0.95);
+        }
+        
+        #mustard-level {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, #DAA520, #FFD700);
+            transition: height 0.5s;
+            box-shadow: inset 0 0 10px rgba(139, 69, 19, 0.5);
+        }
+        
+        #mustard-count {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        #upgrades {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .upgrade {
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            border: 2px solid #DAA520;
+            border-radius: 10px;
+            padding: 10px;
+            width: 120px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .upgrade:hover {
+            transform: translateY(-2px);
+            box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .upgrade:active {
+            transform: translateY(1px);
+        }
+        
+        .upgrade:disabled {
+            background: #D3D3D3;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .upgrade-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #8B4513;
+        }
+        
+        .upgrade-cost {
+            color: #8B4513;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .upgrade-effect {
+            font-size: 12px;
+            color: #556B2F;
+        }
+        
+        #stats {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            border-radius: 10px;
+            border: 2px solid #DAA520;
+            box-shadow: inset 0 0 10px rgba(139, 69, 19, 0.2);
+        }
+        
+        .stat {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .stat-name {
+            font-weight: bold;
+        }
+        
+        .stat-value {
+            color: #556B2F;
+        }
+        
+        .mustard-bottle {
+            position: absolute;
+            width: 50px;
+            height: 80px;
+            z-index: 1;
+            pointer-events: none;
+            transform-origin: center bottom;
+            filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.3));
+        }
+        
+        .bottle-body {
+            position: absolute;
+            width: 100%;
+            height: 80%;
+            bottom: 0;
+            background: linear-gradient(to right, #FFD700, #F0E68C, #FFD700);
+            border-radius: 15px 15px 30px 30px;
+            border: 3px solid #B8860B;
+            overflow: hidden;
+        }
+        
+        .bottle-neck {
+            position: absolute;
+            width: 40%;
+            height: 20%;
+            top: 0;
+            left: 30%;
+            background: linear-gradient(to right, #FFD700, #F0E68C, #FFD700);
+            border-radius: 10px 10px 0 0;
+            border: 3px solid #B8860B;
+            border-bottom: none;
+        }
+        
+        .bottle-cap {
+            position: absolute;
+            width: 50%;
+            height: 8%;
+            top: -5%;
+            left: 25%;
+            background: #8B4513;
+            border-radius: 5px 5px 0 0;
+            border: 2px solid #654321;
+        }
+        
+        .bottle-label {
+            position: absolute;
+            width: 80%;
+            height: 40%;
+            background-color: white;
+            left: 10%;
+            top: 15%;
+            border: 2px solid #B8860B;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: bold;
+            color: #8B4513;
+        }
+        
+        .bottle-highlight {
+            position: absolute;
+            width: 30%;
+            height: 20%;
+            right: 5%;
+            top: 10%;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(0.1); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.5); opacity: 0; }
+        }
+        
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            0% { top: -50px; opacity: 0; }
+            100% { top: 20px; opacity: 1; }
+        }
+        
+        /* Side panel styles */
+        #side-panel {
+            position: fixed;
+            right: -300px;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            border-left: 3px solid #DAA520;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+            transition: right 0.3s ease;
+            z-index: 20;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        
+        #side-panel.open {
+            right: 0;
+        }
+        
+        #toggle-panel {
+            position: fixed;
+            right: 10px;
+            top: 10px;
+            background: #DAA520;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 30;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+        
+        #toggle-panel:hover {
+            background: #B8860B;
+            transform: scale(1.1);
+        }
+        
+        #toggle-panel.open {
+            right: 310px;
+        }
+        
+        /* Achievement styles */
+        .achievement {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .achievement.locked {
+            opacity: 0.6;
+        }
+        
+        .achievement-icon {
+            width: 32px;
+            height: 32px;
+            margin-right: 10px;
+            background-color: #DAA520;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .achievement-info {
+            flex-grow: 1;
+        }
+        
+        .achievement-name {
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 14px;
+        }
+        
+        .achievement-desc {
+            font-size: 12px;
+            color: #556B2F;
+        }
+        
+        .achievement-progress {
+            height: 4px;
+            background: #B8860B;
+            border-radius: 2px;
+            margin-top: 4px;
+        }
+        
+        .achievement-progress-bar {
+            height: 100%;
+            background: #FFD700;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        /* Panel header */
+        .panel-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #DAA520;
+            text-align: center;
+        }
+        
+        /* New styles for activities */
+        #activities {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            border-radius: 10px;
+            border: 2px solid #DAA520;
+            box-shadow: inset 0 0 10px rgba(139, 69, 19, 0.2);
+        }
+
+        .activity {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            background-color: #DAA520;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .activity-info {
+            flex-grow: 1;
+        }
+
+        .activity-name {
+            font-weight: bold;
+            color: #8B4513;
+        }
+
+        .activity-desc {
+            font-size: 12px;
+            color: #556B2F;
+        }
+
+        .activity-button {
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .activity-button:hover {
+            background: #A0522D;
+        }
+
+        .activity-button:disabled {
+            background: #D3D3D3;
+            cursor: not-allowed;
+        }
+
+        .activity-cooldown {
+            font-size: 12px;
+            color: #8B4513;
+            margin-top: 3px;
+        }
+
+        /* New achievement colors */
+        .achievement.bronze .achievement-icon {
+            background-color: #CD7F32;
+        }
+        .achievement.silver .achievement-icon {
+            background-color: #C0C0C0;
+        }
+        .achievement.gold .achievement-icon {
+            background-color: #FFD700;
+        }
+        .achievement.platinum .achievement-icon {
+            background-color: #E5E4E2;
+        }
+
+        /* New styles for code modal */
+        #code-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #code-container {
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #DAA520;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        #code-container h2 {
+            color: #8B4513;
+            margin-top: 0;
+        }
+
+        #code-input {
+            width: 80%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 2px solid #DAA520;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .code-button {
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .code-button:hover {
+            background: #A0522D;
+        }
+
+        #code-message {
+            margin-top: 10px;
+            min-height: 20px;
+            color: #8B4513;
+            font-weight: bold;
+        }
+
+        /* New secret button style */
+        #secret-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 50;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+
+        #secret-button:hover {
+            opacity: 1;
+        }
+
+        #secret-button img {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* New styles for prestige system */
+        #prestige-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            border-radius: 10px;
+            border: 2px solid #DAA520;
+            box-shadow: inset 0 0 10px rgba(139, 69, 19, 0.2);
+        }
+
+        #prestige-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        #prestige-info {
+            font-size: 14px;
+            color: #556B2F;
+            margin-bottom: 10px;
+        }
+
+        #prestige-button {
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        #prestige-button:hover {
+            background: #A0522D;
+        }
+
+        #prestige-button:disabled {
+            background: #D3D3D3;
+            cursor: not-allowed;
+        }
+
+        #mustard-seeds {
+            font-weight: bold;
+            color: #8B4513;
+            margin-top: 5px;
+        }
+
+        .prestige-upgrade {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+        }
+
+        .prestige-upgrade-icon {
+            width: 32px;
+            height: 32px;
+            margin-right: 10px;
+            background-color: #8B4513;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .prestige-upgrade-info {
+            flex-grow: 1;
+        }
+
+        .prestige-upgrade-name {
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 14px;
+        }
+
+        .prestige-upgrade-desc {
+            font-size: 12px;
+            color: #556B2F;
+        }
+
+        .prestige-upgrade-cost {
+            font-size: 12px;
+            color: #8B4513;
+            margin-top: 3px;
+        }
+
+        .prestige-upgrade-button {
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+
+        .prestige-upgrade-button:hover {
+            background: #A0522D;
+        }
+
+        .prestige-upgrade-button:disabled {
+            background: #D3D3D3;
+            cursor: not-allowed;
+        }
+
+        /* New styles for mini-games */
+        #minigames-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            border-radius: 10px;
+            border: 2px solid #DAA520;
+            box-shadow: inset 0 0 10px rgba(139, 69, 19, 0.2);
+        }
+
+        #minigames-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .minigame {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+        }
+
+        .minigame-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            background-color: #DAA520;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .minigame-info {
+            flex-grow: 1;
+        }
+
+        .minigame-name {
+            font-weight: bold;
+            color: #8B4513;
+        }
+
+        .minigame-desc {
+            font-size: 12px;
+            color: #556B2F;
+        }
+
+        .minigame-button {
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .minigame-button:hover {
+            background: #A0522D;
+        }
+
+        .minigame-button:disabled {
+            background: #D3D3D3;
+            cursor: not-allowed;
+        }
+
+        /* Mini-game modal styles */
+        .minigame-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .minigame-container {
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #DAA520;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .minigame-header {
+            font-size: 20px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 15px;
+        }
+
+        .minigame-content {
+            margin-bottom: 15px;
+        }
+
+        .minigame-close {
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .minigame-close:hover {
+            background: #A0522D;
+        }
+
+        /* Memory Match game styles */
+        #memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .memory-card {
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: #8B4513;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .memory-card.flipped {
+            background-color: #F5DEB3;
+            color: #8B4513;
+        }
+
+        .memory-card.matched {
+            background-color: #556B2F;
+            cursor: default;
+        }
+
+        #memory-score {
+            font-weight: bold;
+            color: #8B4513;
+            margin: 10px 0;
+        }
+
+        /* Whack-a-Mole game styles */
+        #whack-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .whack-hole {
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: #8B4513;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .whack-mole {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            bottom: -80%;
+            left: 10%;
+            background-color: #654321;
+            border-radius: 50% 50% 0 0;
+            transition: bottom 0.3s;
+        }
+
+        .whack-mole.up {
+            bottom: 10%;
+        }
+
+        #whack-timer, #whack-score {
+            font-weight: bold;
+            color: #8B4513;
+            margin: 10px 0;
+        }
+
+        /* Slot Machine game styles */
+        #slot-machine {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .slot-reel {
+            width: 60px;
+            height: 80px;
+            background-color: #8B4513;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slot-symbol {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            position: absolute;
+        }
+
+        #slot-spin {
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        #slot-spin:hover {
+            background: #A0522D;
+        }
+
+        #slot-spin:disabled {
+            background: #D3D3D3;
+            cursor: not-allowed;
+        }
+
+        #slot-result {
+            font-weight: bold;
+            color: #8B4513;
+            margin: 10px 0;
+        }
+
+        /* Research tree styles */
+        #research-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            border-radius: 10px;
+            border: 2px solid #DAA520;
+            box-shadow: inset 0 0 10px rgba(139, 69, 19, 0.2);
+        }
+
+        #research-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        #research-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .research-tier {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .research-node {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            border: 2px solid #DAA520;
+            text-align: center;
+            width: 100px;
+            position: relative;
+        }
+
+        .research-node.locked {
+            opacity: 0.5;
+            background: #D3D3D3;
+        }
+
+        .research-node.unlocked {
+            background: rgba(218, 165, 32, 0.3);
+        }
+
+        .research-node.completed {
+            background: rgba(85, 107, 47, 0.3);
+        }
+
+        .research-node-name {
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .research-node-desc {
+            font-size: 10px;
+            color: #556B2F;
+            margin-bottom: 5px;
+        }
+
+        .research-node-cost {
+            font-size: 10px;
+            color: #8B4513;
+            margin-bottom: 5px;
+        }
+
+        .research-node-button {
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 3px 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 10px;
+        }
+
+        .research-node-button:hover {
+            background: #A0522D;
+        }
+
+        .research-node-button:disabled {
+            background: #D3D3D3;
+            cursor: not-allowed;
+        }
+
+        .research-connector {
+            position: absolute;
+            height: 10px;
+            width: 2px;
+            background-color: #8B4513;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Seasonal event styles */
+        #event-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            border-radius: 10px;
+            border: 2px solid #DAA520;
+            box-shadow: inset 0 0 10px rgba(139, 69, 19, 0.2);
+        }
+
+        #event-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        #event-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #event-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 5px;
+        }
+
+        #event-desc {
+            font-size: 14px;
+            color: #556B2F;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        #event-timer {
+            font-size: 14px;
+            color: #8B4513;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #event-progress {
+            width: 100%;
+            height: 10px;
+            background-color: #DAA520;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        #event-progress-bar {
+            height: 100%;
+            background-color: #FFD700;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .event-reward {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .event-reward-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            background-color: #8B4513;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .event-reward-info {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .event-reward-name {
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 12px;
+        }
+
+        .event-reward-desc {
+            font-size: 10px;
+            color: #556B2F;
+        }
+
+        .event-reward-status {
+            font-size: 12px;
+            color: #8B4513;
+            font-weight: bold;
+        }
+
+        /* Manager system styles */
+        #managers-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            border-radius: 10px;
+            border: 2px solid #DAA520;
+            box-shadow: inset 0 0 10px rgba(139, 69, 19, 0.2);
+        }
+
+        #managers-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .manager {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+        }
+
+        .manager-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            background-color: #DAA520;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .manager-info {
+            flex-grow: 1;
+        }
+
+        .manager-name {
+            font-weight: bold;
+            color: #8B4513;
+        }
+
+        .manager-desc {
+            font-size: 12px;
+            color: #556B2F;
+        }
+
+        .manager-button {
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .manager-button:hover {
+            background: #A0522D;
+        }
+
+        .manager-button:disabled {
+            background: #D3D3D3;
+            cursor: not-allowed;
+        }
+
+        /* Save system styles */
+        #save-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(to bottom, #F5DEB3, #EEE8AA);
+            border-radius: 10px;
+            border: 2px solid #DAA520;
+            box-shadow: inset 0 0 10px rgba(139, 69, 19, 0.2);
+        }
+
+        #save-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .save-button {
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        .save-button:hover {
+            background: #A0522D;
+        }
+
+        #save-info {
+            font-size: 12px;
+            color: #556B2F;
+            margin-top: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #game-container {
+                max-width: 100%;
+                padding: 10px;
+            }
+            
+            #upgrades {
+                gap: 5px;
+            }
+            
+            .upgrade {
+                width: 100px;
+                padding: 5px;
+                font-size: 12px;
+            }
+            
+            .research-tier {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Animation for golden shower */
+        @keyframes goldenShower {
+            0% { transform: translateY(-100px) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        /* Animation for prestige effect */
+        @keyframes prestigePulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Animation for research unlock */
+        @keyframes researchUnlock {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(218, 165, 32, 0.7); }
+            50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(218, 165, 32, 0.7); }
+            100% { transform: scale(1); box-shadow: 0 0 0 rgba(218, 165, 32, 0.7); }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles"></div>
+    <div id="notification" class="notification" style="display: none;"></div>
+    
+    <button id="toggle-panel">🏆</button>
+    
+    <div id="side-panel">
+        <div class="panel-header">Achievements</div>
+        <div class="achievement locked bronze" id="achievement-1">
+            <div class="achievement-icon">1</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Mustard Noob</div>
+                <div class="achievement-desc">Reach 10,000 mustard</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-1"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked silver" id="achievement-2">
+            <div class="achievement-icon">2</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Mustard Enthusiast</div>
+                <div class="achievement-desc">Reach 50,000 mustard</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-2"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked gold" id="achievement-3">
+            <div class="achievement-icon">3</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Mustard Master</div>
+                <div class="achievement-desc">Reach 100,000 mustard</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-3"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked platinum" id="achievement-4">
+            <div class="achievement-icon">4</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Mustard Legend</div>
+                <div class="achievement-desc">Reach 1,000,000 mustard</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-4"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked bronze" id="achievement-5">
+            <div class="achievement-icon">5</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Click Champion</div>
+                <div class="achievement-desc">Make 1,000 clicks</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-5"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked silver" id="achievement-6">
+            <div class="achievement-icon">6</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Click Master</div>
+                <div class="achievement-desc">Make 10,000 clicks</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-6"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked gold" id="achievement-7">
+            <div class="achievement-icon">7</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Click Legend</div>
+                <div class="achievement-desc">Make 100,000 clicks</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-7"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked bronze" id="achievement-8">
+            <div class="achievement-icon">8</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Upgrade Guru</div>
+                <div class="achievement-desc">Buy 10 upgrades</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-8"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked silver" id="achievement-9">
+            <div class="achievement-icon">9</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Upgrade Master</div>
+                <div class="achievement-desc">Buy 50 upgrades</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-9"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked silver" id="achievement-10">
+            <div class="achievement-icon">10</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Factory Owner</div>
+                <div class="achievement-desc">Own 5 Mustard Factories</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-10"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked gold" id="achievement-11">
+            <div class="achievement-icon">11</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Cosmic Collector</div>
+                <div class="achievement-desc">Own 3 Cosmic Condiments</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-11"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked bronze" id="achievement-12">
+            <div class="achievement-icon">12</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Spicy Fan</div>
+                <div class="achievement-desc">Use Spicy Boost 5 times</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-12"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked silver" id="achievement-13">
+            <div class="achievement-icon">13</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Golden Lover</div>
+                <div class="achievement-desc">Use Golden Shower 3 times</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-13"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked gold" id="achievement-14">
+            <div class="achievement-icon">14</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Rainbow Chaser</div>
+                <div class="achievement-desc">Trigger rainbow mode 3 times</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-14"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked platinum" id="achievement-15">
+            <div class="achievement-icon">15</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Ascended One</div>
+                <div class="achievement-desc">Perform 5 ascensions</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-15"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked gold" id="achievement-16">
+            <div class="achievement-icon">16</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Research Pioneer</div>
+                <div class="achievement-desc">Complete 10 research projects</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-16"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked silver" id="achievement-17">
+            <div class="achievement-icon">17</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Mini-Game Master</div>
+                <div class="achievement-desc">Play each mini-game 5 times</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-17"></div>
+                </div>
+            </div>
+        </div>
+        <div class="achievement locked bronze" id="achievement-18">
+            <div class="achievement-icon">18</div>
+            <div class="achievement-info">
+                <div class="achievement-name">Event Participant</div>
+                <div class="achievement-desc">Complete a seasonal event</div>
+                <div class="achievement-progress">
+                    <div class="achievement-progress-bar" id="progress-18"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="game-wrapper">
+        <div id="game-container">
+            <h1>Mustard Clicker Deluxe</h1>
+            <p id="subtitle">The Condiment Conquest</p>
+            
+            <div id="mustard-count">0 Mustard</div>
+            
+            <div id="mustard-jar">
+                <div id="mustard-level" style="height: 0%;"></div>
+            </div>
+            
+            <div id="stats">
+                <div class="stat">
+                    <span class="stat-name">Mustard per click:</span>
+                    <span class="stat-value" id="click-value">1</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-name">Mustard per second:</span>
+                    <span class="stat-value" id="passive-rate">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-name">Total upgrades:</span>
+                    <span class="stat-value" id="total-upgrades">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-name">Total clicks:</span>
+                    <span class="stat-value" id="total-clicks">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-name">Mustard Seeds:</span>
+                    <span class="stat-value" id="mustard-seeds">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-name">Ascensions:</span>
+                    <span class="stat-value" id="total-ascensions">0</span>
+                </div>
+            </div>
+            
+            <h2>Upgrades</h2>
+            <div id="upgrades">
+                <button class="upgrade" onclick="buyUpgrade(0)">
+                    <div class="upgrade-name">Better Spoon</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-0">10</span> Mustard</div>
+                    <div class="upgrade-effect">+1 per click</div>
+                    <div>Owned: <span id="upgrade-owned-0">0</span></div>
+                </button>
+                
+                <button class="upgrade" onclick="buyUpgrade(1)">
+                    <div class="upgrade-name">Mustard Tap</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-1">50</span> Mustard</div>
+                    <div class="upgrade-effect">+0.5 per second</div>
+                    <div>Owned: <span id="upgrade-owned-1">0</span></div>
+                </button>
+                
+                <button class="upgrade" onclick="buyUpgrade(2)">
+                    <div class="upgrade-name">Industrial Pump</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-2">200</span> Mustard</div>
+                    <div class="upgrade-effect">+2 per second</div>
+                    <div>Owned: <span id="upgrade-owned-2">0</span></div>
+                </button>
+                
+                <button class="upgrade" onclick="buyUpgrade(3)">
+                    <div class="upgrade-name">Golden Spoon</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-3">500</span> Mustard</div>
+                    <div class="upgrade-effect">+5 per click</div>
+                    <div>Owned: <span id="upgrade-owned-3">0</span></div>
+                </button>
+                
+                <button class="upgrade" onclick="buyUpgrade(4)">
+                    <div class="upgrade-name">Mustard Factory</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-4">1000</span> Mustard</div>
+                    <div class="upgrade-effect">+10 per second</div>
+                    <div>Owned: <span id="upgrade-owned-4">0</span></div>
+                </button>
+                
+                <button class="upgrade" onclick="buyUpgrade(5)">
+                    <div class="upgrade-name">Quantum Mustard</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-5">5000</span> Mustard</div>
+                    <div class="upgrade-effect">+25 per second</div>
+                    <div>Owned: <span id="upgrade-owned-5">0</span></div>
+                </button>
+                
+                <button class="upgrade" onclick="buyUpgrade(6)">
+                    <div class="upgrade-name">Intergalactic Sauce</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-6">10000</span> Mustard</div>
+                    <div class="upgrade-effect">+100 per second</div>
+                    <div>Owned: <span id="upgrade-owned-6">0</span></div>
+                </button>
+                
+                <button class="upgrade" onclick="buyUpgrade(7)">
+                    <div class="upgrade-name">Cosmic Condiment</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-7">50000</span> Mustard</div>
+                    <div class="upgrade-effect">+500 per second</div>
+                    <div>Owned: <span id="upgrade-owned-7">0</span></div>
+                </button>
+                
+                <button class="upgrade" onclick="buyUpgrade(8)">
+                    <div class="upgrade-name">Mustard Singularity</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-8">100000</span> Mustard</div>
+                    <div class="upgrade-effect">+1000 per second</div>
+                    <div>Owned: <span id="upgrade-owned-8">0</span></div>
+                </button>
+                
+                <button class="upgrade" onclick="buyUpgrade(9)">
+                    <div class="upgrade-name">Dijon Dimension</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-9">250000</span> Mustard</div>
+                    <div class="upgrade-effect">+2500 per second</div>
+                    <div>Owned: <span id="upgrade-owned-9">0</span></div>
+                </button>
+                
+                <button class="upgrade" onclick="buyUpgrade(10)">
+                    <div class="upgrade-name">Honey Mustard Hive</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-10">500000</span> Mustard</div>
+                    <div class="upgrade-effect">+5000 per second</div>
+                    <div>Owned: <span id="upgrade-owned-10">0</span></div>
+                </button>
+                
+                <button class="upgrade" onclick="buyUpgrade(11)">
+                    <div class="upgrade-name">Spicy Mustard Storm</div>
+                    <div class="upgrade-cost">Cost: <span id="upgrade-cost-11">1000000</span> Mustard</div>
+                    <div class="upgrade-effect">+10000 per second</div>
+                    <div>Owned: <span id="upgrade-owned-11">0</span></div>
+                </button>
+            </div>
+            
+            <h2>Special Activities</h2>
+            <div id="activities">
+                <div class="activity">
+                    <div class="activity-icon">🌶️</div>
+                    <div class="activity-info">
+                        <div class="activity-name">Spicy Mustard Boost</div>
+                        <div class="activity-desc">Double your click power for 30 seconds</div>
+                        <div class="activity-cooldown" id="spicy-cooldown"></div>
+                    </div>
+                    <button class="activity-button" id="spicy-button" onclick="activateSpicyBoost()">Activate (Cost: 500)</button>
+                </div>
+                <div class="activity">
+                    <div class="activity-icon">🔄</div>
+                    <div class="activity-info">
+                        <div class="activity-name">Mustard Refill</div>
+                        <div class="activity-desc">Instantly gain 10% of your current mustard</div>
+                        <div class="activity-cooldown" id="refill-cooldown"></div>
+                    </div>
+                    <button class="activity-button" id="refill-button" onclick="activateRefill()">Activate (Cost: 250)</button>
+                </div>
+                <div class="activity">
+                    <div class="activity-icon">✨</div>
+                    <div class="activity-info">
+                        <div class="activity-name">Golden Shower</div>
+                        <div class="activity-desc">Summon 50 golden bottles for massive mustard</div>
+                        <div class="activity-cooldown" id="shower-cooldown"></div>
+                    </div>
+                    <button class="activity-button" id="shower-button" onclick="activateGoldenShower()">Activate (Cost: 2000)</button>
+                </div>
+            </div>
+            
+            <h2>Mini-Games</h2>
+            <div id="minigames-container">
+                <div id="minigames-header">Play to Earn Bonus Mustard</div>
+                <div class="minigame">
+                    <div class="minigame-icon">🧠</div>
+                    <div class="minigame-info">
+                        <div class="minigame-name">Mustard Memory</div>
+                        <div class="minigame-desc">Match pairs to earn mustard</div>
+                    </div>
+                    <button class="minigame-button" onclick="startMemoryGame()">Play</button>
+                </div>
+                <div class="minigame">
+                    <div class="minigame-icon">👊</div>
+                    <div class="minigame-info">
+                        <div class="minigame-name">Whack-a-Mustard</div>
+                        <div class="minigame-desc">Click the popping mustard bottles</div>
+                    </div>
+                    <button class="minigame-button" onclick="startWhackGame()">Play</button>
+                </div>
+                <div class="minigame">
+                    <div class="minigame-icon">🎰</div>
+                    <div class="minigame-info">
+                        <div class="minigame-name">Mustard Slots</div>
+                        <div class="minigame-desc">Spin for a chance to win big</div>
+                    </div>
+                    <button class="minigame-button" onclick="startSlotGame()">Play</button>
+                </div>
+            </div>
+            
+            <h2>Research & Development</h2>
+            <div id="research-container">
+                <div id="research-header">Unlock New Technologies</div>
+                <div id="research-tree">
+                    <div class="research-tier">
+                        <div class="research-node locked" id="research-1">
+                            <div class="research-node-name">Basic Automation</div>
+                            <div class="research-node-desc">Unlocks auto-clicker</div>
+                            <div class="research-node-cost">Cost: 1,000 Mustard</div>
+                            <button class="research-node-button" onclick="researchTechnology(1)" disabled>Research</button>
+                            <div class="research-connector"></div>
+                        </div>
+                    </div>
+                    <div class="research-tier">
+                        <div class="research-node locked" id="research-2">
+                            <div class="research-node-name">Improved Containers</div>
+                            <div class="research-node-desc">+10% to all mustard gains</div>
+                            <div class="research-node-cost">Cost: 5,000 Mustard</div>
+                            <button class="research-node-button" onclick="researchTechnology(2)" disabled>Research</button>
+                            <div class="research-connector"></div>
+                        </div>
+                        <div class="research-node locked" id="research-3">
+                            <div class="research-node-name">Efficient Production</div>
+                            <div class="research-node-desc">Upgrades cost 5% less</div>
+                            <div class="research-node-cost">Cost: 5,000 Mustard</div>
+                            <button class="research-node-button" onclick="researchTechnology(3)" disabled>Research</button>
+                            <div class="research-connector"></div>
+                        </div>
+                    </div>
+                    <div class="research-tier">
+                        <div class="research-node locked" id="research-4">
+                            <div class="research-node-name">Advanced Chemistry</div>
+                            <div class="research-node-desc">Unlocks new upgrades</div>
+                            <div class="research-node-cost">Cost: 10,000 Mustard</div>
+                            <button class="research-node-button" onclick="researchTechnology(4)" disabled>Research</button>
+                            <div class="research-connector"></div>
+                        </div>
+                        <div class="research-node locked" id="research-5">
+                            <div class="research-node-name">Quality Control</div>
+                            <div class="research-node-desc">Activities are 10% more effective</div>
+                            <div class="research-node-cost">Cost: 10,000 Mustard</div>
+                            <button class="research-node-button" onclick="researchTechnology(5)" disabled>Research</button>
+                            <div class="research-connector"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2>Prestige System</h2>
+            <div id="prestige-container">
+                <div id="prestige-header">Ascension</div>
+                <div id="prestige-info">
+                    Reset your progress to gain Mustard Seeds, which provide permanent bonuses.
+                    You'll earn seeds based on your total mustard production.
+                </div>
+                <div id="mustard-seeds">Mustard Seeds: 0</div>
+                <button id="prestige-button" onclick="ascend()" disabled>Ascend (Requires 100,000 Mustard)</button>
+                
+                <div class="prestige-upgrade">
+                    <div class="prestige-upgrade-icon">1</div>
+                    <div class="prestige-upgrade-info">
+                        <div class="prestige-upgrade-name">Seed Multiplier</div>
+                        <div class="prestige-upgrade-desc">Gain 10% more Mustard Seeds per ascension</div>
+                        <div class="prestige-upgrade-cost">Cost: 5 Mustard Seeds</div>
+                    </div>
+                    <button class="prestige-upgrade-button" id="prestige-upgrade-1" onclick="buyPrestigeUpgrade(1)">Buy</button>
+                </div>
+                
+                <div class="prestige-upgrade">
+                    <div class="prestige-upgrade-icon">2</div>
+                    <div class="prestige-upgrade-info">
+                        <div class="prestige-upgrade-name">Click Power</div>
+                        <div class="prestige-upgrade-desc">+1 base click power per seed</div>
+                        <div class="prestige-upgrade-cost">Cost: 10 Mustard Seeds</div>
+                    </div>
+                    <button class="prestige-upgrade-button" id="prestige-upgrade-2" onclick="buyPrestigeUpgrade(2)">Buy</button>
+                </div>
+                
+                <div class="prestige-upgrade">
+                    <div class="prestige-upgrade-icon">3</div>
+                    <div class="prestige-upgrade-info">
+                        <div class="prestige-upgrade-name">Passive Boost</div>
+                        <div class="prestige-upgrade-desc">+1% passive production per seed</div>
+                        <div class="prestige-upgrade-cost">Cost: 15 Mustard Seeds</div>
+                    </div>
+                    <button class="prestige-upgrade-button" id="prestige-upgrade-3" onclick="buyPrestigeUpgrade(3)">Buy</button>
+                </div>
+                
+                <div class="prestige-upgrade">
+                    <div class="prestige-upgrade-icon">4</div>
+                    <div class="prestige-upgrade-info">
+                        <div class="prestige-upgrade-name">Golden Chance</div>
+                        <div class="prestige-upgrade-desc">+1% chance for golden clicks per seed</div>
+                        <div class="prestige-upgrade-cost">Cost: 20 Mustard Seeds</div>
+                    </div>
+                    <button class="prestige-upgrade-button" id="prestige-upgrade-4" onclick="buyPrestigeUpgrade(4)">Buy</button>
+                </div>
+                
+                <div class="prestige-upgrade">
+                    <div class="prestige-upgrade-icon">5</div>
+                    <div class="prestige-upgrade-info">
+                        <div class="prestige-upgrade-name">Rainbow Frequency</div>
+                        <div class="prestige-upgrade-desc">Rainbow mode lasts 10% longer per seed</div>
+                        <div class="prestige-upgrade-cost">Cost: 25 Mustard Seeds</div>
+                    </div>
+                    <button class="prestige-upgrade-button" id="prestige-upgrade-5" onclick="buyPrestigeUpgrade(5)">Buy</button>
+                </div>
+            </div>
+            
+            <h2>Managers</h2>
+            <div id="managers-container">
+                <div id="managers-header">Hire Managers to Automate Tasks</div>
+                <div class="manager">
+                    <div class="manager-icon">🖱️</div>
+                    <div class="manager-info">
+                        <div class="manager-name">Click Manager</div>
+                        <div class="manager-desc">Automatically clicks the jar for you</div>
+                    </div>
+                    <button class="manager-button" id="click-manager" onclick="hireManager('click')">Hire (Cost: 5,000 Mustard)</button>
+                </div>
+                <div class="manager">
+                    <div class="manager-icon">🌶️</div>
+                    <div class="manager-info">
+                        <div class="manager-name">Spicy Manager</div>
+                        <div class="manager-desc">Automatically uses Spicy Boost when available</div>
+                    </div>
+                    <button class="manager-button" id="spicy-manager" onclick="hireManager('spicy')">Hire (Cost: 10,000 Mustard)</button>
+                </div>
+                <div class="manager">
+                    <div class="manager-icon">✨</div>
+                    <div class="manager-info">
+                        <div class="manager-name">Golden Manager</div>
+                        <div class="manager-desc">Automatically uses Golden Shower when available</div>
+                    </div>
+                    <button class="manager-button" id="golden-manager" onclick="hireManager('golden')">Hire (Cost: 20,000 Mustard)</button>
+                </div>
+            </div>
+            
+            <h2>Seasonal Event</h2>
+            <div id="event-container">
+                <div id="event-header">Summer Mustard Festival</div>
+                <div id="event-content">
+                    <div id="event-title">Beach Party Mustard!</div>
+                    <div id="event-desc">Celebrate summer with special beach-themed mustard rewards!</div>
+                    <div id="event-timer">Event ends in: 7 days</div>
+                    <div id="event-progress">
+                        <div id="event-progress-bar"></div>
+                    </div>
+                    <div class="event-reward">
+                        <div class="event-reward-icon">🏖️</div>
+                        <div class="event-reward-info">
+                            <div class="event-reward-name">Beach Umbrella</div>
+                            <div class="event-reward-desc">+5% to all mustard gains</div>
+                        </div>
+                        <div class="event-reward-status">0/100</div>
+                    </div>
+                    <div class="event-reward">
+                        <div class="event-reward-icon">🌊</div>
+                        <div class="event-reward-info">
+                            <div class="event-reward-name">Ocean Wave</div>
+                            <div class="event-reward-desc">Passive production +10%</div>
+                        </div>
+                        <div class="event-reward-status">0/250</div>
+                    </div>
+                    <div class="event-reward">
+                        <div class="event-reward-icon">☀️</div>
+                        <div class="event-reward-info">
+                            <div class="event-reward-name">Sunny Day</div>
+                            <div class="event-reward-desc">Click power +15%</div>
+                        </div>
+                        <div class="event-reward-status">0/500</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2>Save Game</h2>
+            <div id="save-container">
+                <div id="save-header">Backup Your Mustard Empire</div>
+                <button class="save-button" onclick="saveGame()">Save Game</button>
+                <button class="save-button" onclick="loadGame()">Load Game</button>
+                <button class="save-button" onclick="exportSave()">Export Save</button>
+                <button class="save-button" onclick="importSave()">Import Save</button>
+                <div id="save-info">Game autosaves every 30 seconds</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secret Code Button and Modal -->
+    <button id="secret-button" title="Enter Secret Code">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjOEI0NTEzIiBkPSJNNDgwIDI1NkM0ODAgMzk3LjQgMzk3LjQgNDgwIDI1NiA0ODBTMzIgMzk3LjQgMzIgMjU2UzExNC42IDMyIDI1NiAzMnMyMjQgMTAyLjYgMjI0IDIyNHptLTQwIDBjMC0xMDEuNi04Mi40LTE4NC0xODQtMTg0UzcyIDE1NC40IDcyIDI1NnM4Mi40IDE4NCAxODQgMTg0IDE4NC04Mi40IDE4NC0xODR6bS0xNiAwYzAgOTIuOC03NS4yIDE2OC0xNjggMTY4Uzg4IDM0OC44IDg4IDI1NnM3NS4yLTE2OCAxNjgtMTY4IDE2OCA3NS4yIDE2OCAxNjh6bS0xNiAwYzAtODQtNjgtMTUyLTE1Mi0xNTJTMTA0IDE3MiAxMDQgMjU2czY4IDE1MiAxNTIgMTUyIDE1Mi02OCAxNTItMTUyem0tMjQgMGMwLTcwLjctNTcuMy0xMjgtMTI4LTEyOFMxMjggMTg1LjMgMTI4IDI1NnM1Ny4zIDEyOCAxMjggMTI4IDEyOC01Ny4zIDEyOC0xMjh6bS00MCAwYzAtNDguNi0zOS40LTg4LTg4LTg4cy04OCAzOS40LTg4IDg4IDM5LjQgODggODggODggODgtMzkuNCA4OC04OHptLTQwIDBjMC0yNi41LTIxLjUtNDgtNDgtNDhzLTQ4IDIxLjUtNDggNDggMjEuNSA0OCA0OCA0OCA0OC0yMS41IDQ4LTQ4eiIvPjwvc3ZnPg==" alt="Secret">
+    </button>
+
+    <div id="code-modal">
+        <div id="code-container">
+            <h2>Enter Secret Code</h2>
+            <input type="text" id="code-input" placeholder="Enter code here..." maxlength="20">
+            <div>
+                <button class="code-button" id="submit-code">Submit</button>
+                <button class="code-button" id="close-code">Close</button>
+            </div>
+            <div id="code-message"></div>
+        </div>
+    </div>
+
+    <!-- Mini-game modals -->
+    <div id="memory-modal" class="minigame-modal">
+        <div class="minigame-container">
+            <div class="minigame-header">Mustard Memory Match</div>
+            <div class="minigame-content">
+                <div id="memory-grid"></div>
+                <div id="memory-score">Matches: 0/8</div>
+            </div>
+            <button class="minigame-close" onclick="closeMemoryGame()">Close</button>
+        </div>
+    </div>
+
+    <div id="whack-modal" class="minigame-modal">
+        <div class="minigame-container">
+            <div class="minigame-header">Whack-a-Mustard</div>
+            <div class="minigame-content">
+                <div id="whack-grid"></div>
+                <div id="whack-timer">Time: 30s</div>
+                <div id="whack-score">Score: 0</div>
+            </div>
+            <button class="minigame-close" onclick="closeWhackGame()">Close</button>
+        </div>
+    </div>
+
+    <div id="slot-modal" class="minigame-modal">
+        <div class="minigame-container">
+            <div class="minigame-header">Mustard Slot Machine</div>
+            <div class="minigame-content">
+                <div id="slot-machine">
+                    <div class="slot-reel" id="slot-reel-1">
+                        <div class="slot-symbol">🍔</div>
+                    </div>
+                    <div class="slot-reel" id="slot-reel-2">
+                        <div class="slot-symbol">🍟</div>
+                    </div>
+                    <div class="slot-reel" id="slot-reel-3">
+                        <div class="slot-symbol">🌭</div>
+                    </div>
+                </div>
+                <div id="slot-result">Spin to win!</div>
+                <button id="slot-spin" onclick="spinSlots()">Spin (Cost: 100 Mustard)</button>
+            </div>
+            <button class="minigame-close" onclick="closeSlotGame()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let mustard = 0;
+        let clickValue = 1;
+        let passiveRate = 0;
+        let totalUpgrades = 0;
+        let totalClicks = 0;
+        let bottles = [];
+        let lastTime = 0;
+        let isRainbowActive = false;
+        let rainbowEndTime = 0;
+        
+        // New activity state variables
+        let spicyBoostActive = false;
+        let spicyBoostEndTime = 0;
+        let lastSpicyBoost = 0;
+        let lastRefill = 0;
+        let lastGoldenShower = 0;
+        
+        // Prestige system variables
+        let mustardSeeds = 0;
+        let totalAscensions = 0;
+        let totalMustardProduced = 0;
+        let prestigeUpgrades = {
+            seedMultiplier: 0,
+            clickPower: 0,
+            passiveBoost: 0,
+            goldenChance: 0,
+            rainbowDuration: 0
+        };
+        
+        // Research system variables
+        let researchCompleted = [];
+        let researchUnlocked = [];
+        
+        // Manager system variables
+        let managers = {
+            click: false,
+            spicy: false,
+            golden: false
+        };
+        
+        // Mini-game variables
+        let memoryGame = {
+            cards: [],
+            flippedCards: [],
+            matchedPairs: 0,
+            active: false
+        };
+        
+        let whackGame = {
+            timer: 0,
+            score: 0,
+            active: false,
+            moles: []
+        };
+        
+        let slotGame = {
+            symbols: ['🍔', '🍟', '🌭', '🌮', '🍕', '🥪', '🥓', '🥩'],
+            spinning: false
+        };
+        
+        // Seasonal event variables
+        let eventProgress = 0;
+        let eventRewards = [false, false, false];
+        let eventEndTime = Date.now() + (7 * 24 * 60 * 60 * 1000); // 7 days from now
+        
+        // Upgrade data
+        const upgrades = [
+            { 
+                baseCost: 10, 
+                cost: 10, 
+                clickEffect: 1, 
+                passiveEffect: 0, 
+                name: "Better Spoon",
+                owned: 0,
+                costScale: 1.15
+            },
+            { 
+                baseCost: 50, 
+                cost: 50, 
+                clickEffect: 0, 
+                passiveEffect: 0.5, 
+                name: "Mustard Tap",
+                owned: 0,
+                costScale: 1.15
+            },
+            { 
+                baseCost: 200, 
+                cost: 200, 
+                clickEffect: 0, 
+                passiveEffect: 2, 
+                name: "Industrial Pump",
+                owned: 0,
+                costScale: 1.15
+            },
+            { 
+                baseCost: 500, 
+                cost: 500, 
+                clickEffect: 5, 
+                passiveEffect: 0, 
+                name: "Golden Spoon",
+                owned: 0,
+                costScale: 1.15
+            },
+            { 
+                baseCost: 1000, 
+                cost: 1000, 
+                clickEffect: 0, 
+                passiveEffect: 10, 
+                name: "Mustard Factory",
+                owned: 0,
+                costScale: 1.15
+            },
+            { 
+                baseCost: 5000, 
+                cost: 5000, 
+                clickEffect: 0, 
+                passiveEffect: 25, 
+                name: "Quantum Mustard",
+                owned: 0,
+                costScale: 1.2
+            },
+            { 
+                baseCost: 10000, 
+                cost: 10000, 
+                clickEffect: 0, 
+                passiveEffect: 100, 
+                name: "Intergalactic Sauce",
+                owned: 0,
+                costScale: 1.2
+            },
+            { 
+                baseCost: 50000, 
+                cost: 50000, 
+                clickEffect: 0, 
+                passiveEffect: 500, 
+                name: "Cosmic Condiment",
+                owned: 0,
+                costScale: 1.2
+            },
+            { 
+                baseCost: 100000, 
+                cost: 100000, 
+                clickEffect: 0, 
+                passiveEffect: 1000, 
+                name: "Mustard Singularity",
+                owned: 0,
+                costScale: 1.25
+            },
+            { 
+                baseCost: 250000, 
+                cost: 250000, 
+                clickEffect: 0, 
+                passiveEffect: 2500, 
+                name: "Dijon Dimension",
+                owned: 0,
+                costScale: 1.25
+            },
+            { 
+                baseCost: 500000, 
+                cost: 500000, 
+                clickEffect: 0, 
+                passiveEffect: 5000, 
+                name: "Honey Mustard Hive",
+                owned: 0,
+                costScale: 1.25
+            },
+            { 
+                baseCost: 1000000, 
+                cost: 1000000, 
+                clickEffect: 0, 
+                passiveEffect: 10000, 
+                name: "Spicy Mustard Storm",
+                owned: 0,
+                costScale: 1.3
+            }
+        ];
+        
+        // Research data
+        const researchData = [
+            { id: 1, name: "Basic Automation", desc: "Unlocks auto-clicker", cost: 1000, effect: "unlockClickManager", requires: [] },
+            { id: 2, name: "Improved Containers", desc: "+10% to all mustard gains", cost: 5000, effect: "boostAll", requires: [] },
+            { id: 3, name: "Efficient Production", desc: "Upgrades cost 5% less", cost: 5000, effect: "cheaperUpgrades", requires: [] },
+            { id: 4, name: "Advanced Chemistry", desc: "Unlocks new upgrades", cost: 10000, effect: "unlockUpgrades", requires: [2, 3] },
+            { id: 5, name: "Quality Control", desc: "Activities are 10% more effective", cost: 10000, effect: "boostActivities", requires: [2, 3] }
+        ];
+        
+        // Expanded achievements data
+        let achievements = [
+            { id: 1, name: "Mustard Noob", desc: "Reach 10,000 mustard", goal: 10000, unlocked: false, type: "mustard", tier: "bronze" },
+            { id: 2, name: "Mustard Enthusiast", desc: "Reach 50,000 mustard", goal: 50000, unlocked: false, type: "mustard", tier: "silver" },
+            { id: 3, name: "Mustard Master", desc: "Reach 100,000 mustard", goal: 100000, unlocked: false, type: "mustard", tier: "gold" },
+            { id: 4, name: "Mustard Legend", desc: "Reach 1,000,000 mustard", goal: 1000000, unlocked: false, type: "mustard", tier: "platinum" },
+            { id: 5, name: "Click Champion", desc: "Make 1,000 clicks", goal: 1000, unlocked: false, type: "clicks", tier: "bronze" },
+            { id: 6, name: "Click Master", desc: "Make 10,000 clicks", goal: 10000, unlocked: false, type: "clicks", tier: "silver" },
+            { id: 7, name: "Click Legend", desc: "Make 100,000 clicks", goal: 100000, unlocked: false, type: "clicks", tier: "gold" },
+            { id: 8, name: "Upgrade Guru", desc: "Buy 10 upgrades", goal: 10, unlocked: false, type: "upgrades", tier: "bronze" },
+            { id: 9, name: "Upgrade Master", desc: "Buy 50 upgrades", goal: 50, unlocked: false, type: "upgrades", tier: "silver" },
+            { id: 10, name: "Factory Owner", desc: "Own 5 Mustard Factories", goal: 5, unlocked: false, type: "specificUpgrade", upgradeIndex: 4, tier: "silver" },
+            { id: 11, name: "Cosmic Collector", desc: "Own 3 Cosmic Condiments", goal: 3, unlocked: false, type: "specificUpgrade", upgradeIndex: 7, tier: "gold" },
+            { id: 12, name: "Spicy Fan", desc: "Use Spicy Boost 5 times", goal: 5, unlocked: false, type: "activity", activity: "spicy", count: 0, tier: "bronze" },
+            { id: 13, name: "Golden Lover", desc: "Use Golden Shower 3 times", goal: 3, unlocked: false, type: "activity", activity: "shower", count: 0, tier: "silver" },
+            { id: 14, name: "Rainbow Chaser", desc: "Trigger rainbow mode 3 times", goal: 3, unlocked: false, type: "rainbow", count: 0, tier: "gold" },
+            { id: 15, name: "Ascended One", desc: "Perform 5 ascensions", goal: 5, unlocked: false, type: "ascensions", tier: "platinum" },
+            { id: 16, name: "Research Pioneer", desc: "Complete 10 research projects", goal: 10, unlocked: false, type: "research", tier: "gold" },
+            { id: 17, name: "Mini-Game Master", desc: "Play each mini-game 5 times", goal: 5, unlocked: false, type: "minigames", count: 0, tier: "silver" },
+            { id: 18, name: "Event Participant", desc: "Complete a seasonal event", goal: 1, unlocked: false, type: "events", tier: "bronze" }
+        ];
+
+        // DOM elements
+        const mustardCountElement = document.getElementById('mustard-count');
+        const mustardLevelElement = document.getElementById('mustard-level');
+        const clickValueElement = document.getElementById('click-value');
+        const passiveRateElement = document.getElementById('passive-rate');
+        const totalUpgradesElement = document.getElementById('total-upgrades');
+        const totalClicksElement = document.getElementById('total-clicks');
+        const mustardSeedsElement = document.getElementById('mustard-seeds');
+        const totalAscensionsElement = document.getElementById('total-ascensions');
+        const upgradeButtons = document.querySelectorAll('.upgrade');
+        const particlesContainer = document.getElementById('particles');
+        const notificationElement = document.getElementById('notification');
+        const mustardJar = document.getElementById('mustard-jar');
+        const togglePanel = document.getElementById('toggle-panel');
+        const sidePanel = document.getElementById('side-panel');
+        const gameWrapper = document.getElementById('game-wrapper');
+        const spicyButton = document.getElementById('spicy-button');
+        const refillButton = document.getElementById('refill-button');
+        const showerButton = document.getElementById('shower-button');
+        const spicyCooldown = document.getElementById('spicy-cooldown');
+        const refillCooldown = document.getElementById('refill-cooldown');
+        const showerCooldown = document.getElementById('shower-cooldown');
+        const prestigeButton = document.getElementById('prestige-button');
+        const eventProgressBar = document.getElementById('event-progress-bar');
+        const eventTimer = document.getElementById('event-timer');
+        
+        // New code redemption system elements
+        const secretButton = document.getElementById('secret-button');
+        const codeModal = document.getElementById('code-modal');
+        const codeInput = document.getElementById('code-input');
+        const submitCode = document.getElementById('submit-code');
+        const closeCode = document.getElementById('close-code');
+        const codeMessage = document.getElementById('code-message');
+        
+        // Mini-game elements
+        const memoryModal = document.getElementById('memory-modal');
+        const memoryGrid = document.getElementById('memory-grid');
+        const memoryScore = document.getElementById('memory-score');
+        const whackModal = document.getElementById('whack-modal');
+        const whackGrid = document.getElementById('whack-grid');
+        const whackTimer = document.getElementById('whack-timer');
+        const whackScore = document.getElementById('whack-score');
+        const slotModal = document.getElementById('slot-modal');
+        const slotReels = [
+            document.getElementById('slot-reel-1'),
+            document.getElementById('slot-reel-2'),
+            document.getElementById('slot-reel-3')
+        ];
+        const slotResult = document.getElementById('slot-result');
+        const slotSpin = document.getElementById('slot-spin');
+
+        // Secret codes and their effects
+        const secretCodes = {
+            "GOLDENMUSTARD": {
+                effect: () => {
+                    mustard += 10000;
+                    showNotification("CODE REDEEMED: +10,000 Mustard!");
+                    return "You gained 10,000 Mustard!";
+                },
+                used: false
+            },
+            "RAINBOWPOWER": {
+                effect: () => {
+                    startRainbowEffect();
+                    return "Rainbow mode activated!";
+                },
+                used: false
+            },
+            "FACTORYOWNER": {
+                effect: () => {
+                    upgrades[4].owned += 2; // Mustard Factory
+                    passiveRate += 20; // 2 factories * 10 each
+                    showNotification("CODE REDEEMED: +2 Mustard Factories!");
+                    return "You gained 2 Mustard Factories!";
+                },
+                used: false
+            },
+            "CLICKMASTER": {
+                effect: () => {
+                    clickValue += 10;
+                    showNotification("CODE REDEEMED: +10 Click Power!");
+                    return "Your click power increased by 10!";
+                },
+                used: false
+            },
+            "SECRETSAUCE": {
+                effect: () => {
+                    // Unlock all achievements temporarily for fun
+                    achievements.forEach(ach => {
+                        if (!ach.unlocked) {
+                            ach.unlocked = true;
+                            const element = document.getElementById(`achievement-${ach.id}`);
+                            element.classList.remove('locked');
+                            element.classList.add(ach.tier);
+                        }
+                    });
+                    showNotification("CODE REDEEMED: All achievements unlocked!");
+                    return "All achievements unlocked! (This session only)";
+                },
+                used: false
+            },
+            "PRESTIGEPOWER": {
+                effect: () => {
+                    mustardSeeds += 5;
+                    showNotification("CODE REDEEMED: +5 Mustard Seeds!");
+                    return "You gained 5 Mustard Seeds!";
+                },
+                used: false
+            },
+            "RESEARCHBOOST": {
+                effect: () => {
+                    researchData.forEach(research => {
+                        if (!researchCompleted.includes(research.id)) {
+                            researchUnlocked.push(research.id);
+                        }
+                    });
+                    showNotification("CODE REDEEMED: All research unlocked!");
+                    return "All research projects are now available!";
+                },
+                used: false
+            }
+        };
+        
+        // Initialize research
+        function initResearch() {
+            researchData.forEach(research => {
+                const element = document.getElementById(`research-${research.id}`);
+                if (research.requires.length === 0) {
+                    researchUnlocked.push(research.id);
+                    element.classList.remove('locked');
+                    element.querySelector('button').disabled = mustard < research.cost;
+                }
+            });
+        }
+        
+        // Panel toggle functionality
+        togglePanel.addEventListener('click', () => {
+            sidePanel.classList.toggle('open');
+            togglePanel.classList.toggle('open');
+        });
+        
+        // Create a detailed mustard bottle
+        function createMustardBottle(x) {
+            const bottle = document.createElement('div');
+            bottle.className = 'mustard-bottle';
+            
+            // Random bottle properties
+            const scale = 0.5 + Math.random() * 0.7;
+            const rotation = (Math.random() - 0.5) * 30;
+            const speed = 50 + Math.random() * 100;
+            const swingAmount = 2 + Math.random() * 3;
+            const swingSpeed = 0.5 + Math.random();
+            
+            // Create bottle parts
+            const body = document.createElement('div');
+            body.className = 'bottle-body';
+            
+            const neck = document.createElement('div');
+            neck.className = 'bottle-neck';
+            
+            const cap = document.createElement('div');
+            cap.className = 'bottle-cap';
+            
+            const label = document.createElement('div');
+            label.className = 'bottle-label';
+            label.textContent = 'MUSTARD';
+            
+            const highlight = document.createElement('div');
+            highlight.className = 'bottle-highlight';
+            
+            // Assemble bottle
+            body.appendChild(label);
+            body.appendChild(highlight);
+            bottle.appendChild(body);
+            bottle.appendChild(neck);
+            bottle.appendChild(cap);
+            
+            // Position bottle
+            bottle.style.left = `${x || Math.random() * 100}%`;
+            bottle.style.top = '-100px';
+            bottle.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            
+            particlesContainer.appendChild(bottle);
+            
+            // Store bottle data
+            const bottleData = {
+                element: bottle,
+                y: -100,
+                speed: speed,
+                swingAmount: swingAmount,
+                swingSpeed: swingSpeed,
+                time: 0,
+                rotation: rotation,
+                scale: scale,
+                x: x ? parseFloat(x) : Math.random() * 100
+            };
+            
+            bottles.push(bottleData);
+            return bottleData;
+        }
+        
+        // Update bottle positions
+        function updateBottles(deltaTime) {
+            for (let i = bottles.length - 1; i >= 0; i--) {
+                const bottle = bottles[i];
+                bottle.time += deltaTime;
+                bottle.y += bottle.speed * deltaTime;
+                
+                // Swing side to side
+                const swing = Math.sin(bottle.time * bottle.swingSpeed) * bottle.swingAmount;
+                
+                // Rotate based on swing
+                const rotation = bottle.rotation + swing * 2;
+                
+                bottle.element.style.top = `${bottle.y}px`;
+                bottle.element.style.left = `${bottle.x + swing}%`;
+                bottle.element.style.transform = `scale(${bottle.scale}) rotate(${rotation}deg)`;
+                
+                // Remove if off screen
+                if (bottle.y > window.innerHeight + 100) {
+                    bottle.element.remove();
+                    bottles.splice(i, 1);
+                }
+            }
+        }
+        
+        // Game loop for bottle physics
+        function gameLoop(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const deltaTime = (timestamp - lastTime) / 1000;
+            lastTime = timestamp;
+            
+            updateBottles(deltaTime);
+            
+            // Check rainbow effect expiration
+            if (isRainbowActive && timestamp > rainbowEndTime) {
+                endRainbowEffect();
+            }
+            
+            // Check spicy boost expiration
+            if (spicyBoostActive && timestamp > spicyBoostEndTime) {
+                spicyBoostActive = false;
+                showNotification("Spicy Boost has worn off");
+                updateUI();
+            }
+            
+            // Auto-click if manager is hired
+            if (managers.click && Math.random() < 0.1) {
+                simulateClick();
+            }
+            
+            // Auto-use spicy boost if manager is hired
+            if (managers.spicy && !spicyBoostActive && (performance.now() - lastSpicyBoost) > 60000) {
+                activateSpicyBoost();
+            }
+            
+            // Auto-use golden shower if manager is hired
+            if (managers.golden && (performance.now() - lastGoldenShower) > 120000) {
+                activateGoldenShower();
+            }
+            
+            // Update mini-games if active
+            if (whackGame.active) {
+                updateWhackGame();
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Simulate a click (for auto-clicker)
+        function simulateClick() {
+            totalClicks++;
+            totalClicksElement.textContent = totalClicks;
+            
+            let currentClickValue = clickValue;
+            if (isRainbowActive) {
+                currentClickValue = 1000;
+            } else if (spicyBoostActive) {
+                currentClickValue *= 2;
+            }
+            
+            mustard += currentClickValue;
+            totalMustardProduced += currentClickValue;
+            updateUI();
+        }
+        
+        // Start rainbow effect
+        function startRainbowEffect() {
+            isRainbowActive = true;
+            // Base duration is 10 seconds, increased by prestige upgrades
+            const baseDuration = 10000;
+            const bonusDuration = baseDuration * (prestigeUpgrades.rainbowDuration / 10);
+            rainbowEndTime = performance.now() + baseDuration + bonusDuration;
+            mustardJar.classList.add('rainbow');
+            
+            // Update achievements
+            achievements.forEach(ach => {
+                if (ach.type === "rainbow") {
+                    ach.count++;
+                }
+            });
+            
+            // Show notification
+            showNotification("RAINBOW MUSTARD! Each click = 1000x!");
+            
+            // Create celebration bottles
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const bottle = createMustardBottle(Math.random() * 100);
+                    bottle.speed = 150 + Math.random() * 100;
+                    bottle.swingAmount = 5;
+                    bottle.swingSpeed = 2;
+                }, i * 100);
+            }
+        }
+        
+        // End rainbow effect
+        function endRainbowEffect() {
+            isRainbowActive = false;
+            mustardJar.classList.remove('rainbow');
+            showNotification("Rainbow mustard faded...");
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            notificationElement.textContent = message;
+            notificationElement.style.display = 'block';
+            setTimeout(() => {
+                notificationElement.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Start creating bottles
+        function startMustardRain() {
+            // Initial bottles
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    createMustardBottle();
+                }, i * 300);
+            }
+            
+            // Continuous bottle creation
+            setInterval(() => {
+                if (bottles.length < 20) { // Limit number of bottles
+                    createMustardBottle();
+                }
+            }, 800);
+            
+            // Start game loop
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // New activity functions
+        function activateSpicyBoost() {
+            if (mustard >= 500 && !spicyBoostActive && (performance.now() - lastSpicyBoost) > 60000) {
+                mustard -= 500;
+                spicyBoostActive = true;
+                spicyBoostEndTime = performance.now() + 30000; // 30 seconds
+                lastSpicyBoost = performance.now();
+                
+                // Update achievements
+                achievements.forEach(ach => {
+                    if (ach.type === "activity" && ach.activity === "spicy") {
+                        ach.count++;
+                    }
+                });
+                
+                showNotification("Spicy Boost Activated! 2x Click Power for 30 seconds!");
+                updateUI();
+            }
+        }
+
+        function activateRefill() {
+            if (mustard >= 250 && (performance.now() - lastRefill) > 30000) {
+                mustard -= 250;
+                const bonus = Math.floor(mustard * 0.1);
+                mustard += bonus;
+                lastRefill = performance.now();
+                showNotification(`Refill Complete! Gained ${bonus} mustard!`);
+                updateUI();
+            }
+        }
+
+        function activateGoldenShower() {
+            if (mustard >= 2000 && (performance.now() - lastGoldenShower) > 120000) {
+                mustard -= 2000;
+                lastGoldenShower = performance.now();
+                
+                // Update achievements
+                achievements.forEach(ach => {
+                    if (ach.type === "activity" && ach.activity === "shower") {
+                        ach.count++;
+                    }
+                });
+                
+                showNotification("Golden Shower Activated! 50 golden bottles incoming!");
+                
+                // Create golden bottles
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        const bottle = createMustardBottle(Math.random() * 100);
+                        bottle.speed = 200 + Math.random() * 100;
+                        bottle.swingAmount = 3;
+                        
+                        // Make them golden
+                        bottle.element.querySelector('.bottle-body').style.background = 
+                            "linear-gradient(to right, #FFD700, #FFEC8B, #FFD700)";
+                        
+                        // Add golden shower effect
+                        bottle.element.style.animation = `goldenShower ${2 + Math.random() * 3}s linear forwards`;
+                        
+                        // Award mustard when this bottle is clicked
+                        bottle.element.style.pointerEvents = 'auto';
+                        bottle.element.style.cursor = 'pointer';
+                        bottle.element.addEventListener('click', () => {
+                            const reward = 50 + Math.floor(Math.random() * 100);
+                            mustard += reward;
+                            showNotification(`Golden Bottle! +${reward} Mustard`);
+                            updateUI();
+                            bottle.element.remove();
+                            bottles = bottles.filter(b => b !== bottle);
+                        });
+                    }, i * 200);
+                }
+                
+                updateUI();
+            }
+        }
+
+        // Update activity buttons
+        function updateActivities() {
+            const now = performance.now();
+            
+            // Spicy Boost
+            if (spicyBoostActive) {
+                if (now >= spicyBoostEndTime) {
+                    spicyBoostActive = false;
+                    showNotification("Spicy Boost has worn off");
+                }
+                spicyButton.disabled = true;
+                spicyButton.textContent = "Active!";
+                spicyCooldown.textContent = "";
+            } else {
+                const spicyCooldownRemaining = Math.max(0, 60000 - (now - lastSpicyBoost));
+                spicyButton.disabled = mustard < 500 || spicyCooldownRemaining > 0;
+                spicyButton.textContent = `Activate (Cost: 500)`;
+                if (spicyCooldownRemaining > 0) {
+                    spicyCooldown.textContent = `Cooldown: ${Math.ceil(spicyCooldownRemaining/1000)}s`;
+                } else {
+                    spicyCooldown.textContent = "";
+                }
+            }
+            
+            // Refill
+            const refillCooldownRemaining = Math.max(0, 30000 - (now - lastRefill));
+            refillButton.disabled = mustard < 250 || refillCooldownRemaining > 0;
+            if (refillCooldownRemaining > 0) {
+                refillCooldown.textContent = `Cooldown: ${Math.ceil(refillCooldownRemaining/1000)}s`;
+            } else {
+                refillCooldown.textContent = "";
+            }
+            
+            // Golden Shower
+            const showerCooldownRemaining = Math.max(0, 120000 - (now - lastGoldenShower));
+            showerButton.disabled = mustard < 2000 || showerCooldownRemaining > 0;
+            if (showerCooldownRemaining > 0) {
+                showerCooldown.textContent = `Cooldown: ${Math.ceil(showerCooldownRemaining/1000)}s`;
+            } else {
+                showerCooldown.textContent = "";
+            }
+        }
+        
+        // Click handler
+        document.getElementById('mustard-jar').addEventListener('click', () => {
+            totalClicks++;
+            totalClicksElement.textContent = totalClicks;
+            totalMustardProduced += clickValue;
+            
+            // Check for 10,000 clicks milestone
+            if (totalClicks === 10000 && !isRainbowActive) {
+                achievements.forEach(ach => {
+                    if (ach.type === "rainbow") {
+                        ach.count++;
+                    }
+                });
+                startRainbowEffect();
+            }
+            
+            // Calculate click value (1000x during rainbow, 2x during spicy boost)
+            let currentClickValue = clickValue;
+            if (isRainbowActive) {
+                currentClickValue = 1000;
+            } else if (spicyBoostActive) {
+                currentClickValue *= 2;
+            }
+            
+            // Apply prestige click bonus
+            currentClickValue += prestigeUpgrades.clickPower;
+            
+            // Random chance for golden click (based on prestige upgrades)
+            if (Math.random() < (prestigeUpgrades.goldenChance / 100)) {
+                currentClickValue *= 5;
+                showNotification("GOLDEN CLICK! 5x Mustard!");
+            }
+            
+            mustard += currentClickValue;
+            updateUI();
+            
+            // Create click effect
+            createClickMustard();
+            
+            // Create additional bottles for higher click values
+            if (currentClickValue > 5) {
+                for (let i = 0; i < Math.min(Math.floor(currentClickValue/5), 5); i++) {
+                    setTimeout(() => {
+                        createMustardBottle(50 + (Math.random() * 20 - 10));
+                    }, i * 100);
+                }
+            }
+        });
+        
+        // Create click effect mustard bottle
+        function createClickMustard() {
+            const clickBottle = createMustardBottle(50 + (Math.random() * 20 - 10));
+            clickBottle.y = window.innerHeight / 2;
+            clickBottle.speed = -200 - (Math.random() * 100);
+            clickBottle.swingAmount = 5;
+            clickBottle.swingSpeed = 5;
+            
+            // Remove after animation
+            setTimeout(() => {
+                const index = bottles.indexOf(clickBottle);
+                if (index > -1) {
+                    clickBottle.element.remove();
+                    bottles.splice(index, 1);
+                }
+            }, 1000);
+        }
+        
+        // Buy upgrade
+        function buyUpgrade(index) {
+            const upgrade = upgrades[index];
+            let cost = upgrade.cost;
+            
+            // Apply research discount if available
+            if (researchCompleted.includes(3)) { // Efficient Production
+                cost = Math.floor(cost * 0.95);
+            }
+            
+            if (mustard >= cost) {
+                mustard -= cost;
+                clickValue += upgrade.clickEffect;
+                passiveRate += upgrade.passiveEffect;
+                upgrade.owned++;
+                totalUpgrades++;
+                
+                // Increase cost for next purchase
+                upgrade.cost = Math.floor(upgrade.baseCost * Math.pow(upgrade.costScale, upgrade.owned));
+                
+                updateUI();
+                
+                // Celebration effect for expensive upgrades
+                if (upgrade.baseCost >= 200) {
+                    const count = Math.min(3 + Math.floor(upgrade.baseCost / 200), 10);
+                    for (let i = 0; i < count; i++) {
+                        setTimeout(() => {
+                            const bottle = createMustardBottle(50 + (Math.random() * 20 - 10));
+                            bottle.y = -50 - (Math.random() * 200);
+                            bottle.speed = 100 + (Math.random() * 100);
+                        }, i * 150);
+                    }
+                }
+                
+                // Special notification for big upgrades
+                if (upgrade.baseCost >= 5000) {
+                    showNotification(`UNLOCKED: ${upgrade.name}!`);
+                }
+                
+                // Check for research unlocks
+                checkResearchUnlocks();
+            } else {
+                alert(`You need ${Math.ceil(cost - mustard)} more mustard to buy this upgrade!`);
+            }
+        }
+        
+        // Check for new research unlocks
+        function checkResearchUnlocks() {
+            researchData.forEach(research => {
+                if (!researchUnlocked.includes(research.id) && !researchCompleted.includes(research.id)) {
+                    let allRequirementsMet = true;
+                    research.requires.forEach(reqId => {
+                        if (!researchCompleted.includes(reqId)) {
+                            allRequirementsMet = false;
+                        }
+                    });
+                    
+                    if (allRequirementsMet) {
+                        researchUnlocked.push(research.id);
+                        const element = document.getElementById(`research-${research.id}`);
+                        element.classList.remove('locked');
+                        element.querySelector('button').disabled = mustard < research.cost;
+                        element.style.animation = 'researchUnlock 1s';
+                        setTimeout(() => {
+                            element.style.animation = '';
+                        }, 1000);
+                        showNotification(`New Research Available: ${research.name}`);
+                    }
+                }
+            });
+        }
+        
+        // Research a technology
+        function researchTechnology(id) {
+            const research = researchData.find(r => r.id === id);
+            
+            if (mustard >= research.cost && researchUnlocked.includes(id) && !researchCompleted.includes(id)) {
+                mustard -= research.cost;
+                researchCompleted.push(id);
+                
+                // Apply research effect
+                switch(research.effect) {
+                    case "unlockClickManager":
+                        showNotification("Click Manager Unlocked!");
+                        document.getElementById('click-manager').disabled = mustard < 5000;
+                        break;
+                    case "boostAll":
+                        showNotification("All mustard gains increased by 10%!");
+                        break;
+                    case "cheaperUpgrades":
+                        showNotification("Upgrades now cost 5% less!");
+                        break;
+                    case "unlockUpgrades":
+                        // Unlock additional upgrades (indices 8-11)
+                        for (let i = 8; i <= 11; i++) {
+                            upgrades[i].unlocked = true;
+                            document.getElementById(`upgrade-${i}`).style.display = 'block';
+                        }
+                        showNotification("Advanced upgrades unlocked!");
+                        break;
+                    case "boostActivities":
+                        showNotification("Activities are now 10% more effective!");
+                        break;
+                }
+                
+                // Update research node
+                const element = document.getElementById(`research-${id}`);
+                element.classList.remove('unlocked');
+                element.classList.add('completed');
+                element.querySelector('button').style.display = 'none';
+                
+                // Check for new achievements
+                achievements.forEach(ach => {
+                    if (ach.type === "research" && researchCompleted.length >= ach.goal && !ach.unlocked) {
+                        ach.unlocked = true;
+                        const element = document.getElementById(`achievement-${ach.id}`);
+                        element.classList.remove('locked');
+                        element.classList.add(ach.tier);
+                        showNotification(`Achievement Unlocked: ${ach.name}!`);
+                    }
+                });
+                
+                updateUI();
+            }
+        }
+        
+        // Ascend (prestige) function
+        function ascend() {
+            if (mustard >= 100000) {
+                // Calculate mustard seeds earned
+                let seedsEarned = Math.floor(Math.sqrt(totalMustardProduced / 100000));
+                
+                // Apply seed multiplier from prestige upgrades
+                seedsEarned = Math.floor(seedsEarned * (1 + prestigeUpgrades.seedMultiplier / 10));
+                
+                mustardSeeds += seedsEarned;
+                totalAscensions++;
+                
+                // Reset game state
+                mustard = 0;
+                clickValue = 1 + prestigeUpgrades.clickPower; // Keep prestige click bonus
+                passiveRate = 0;
+                totalUpgrades = 0;
+                totalClicks = 0;
+                totalMustardProduced = 0;
+                
+                // Reset upgrades
+                upgrades.forEach(upgrade => {
+                    upgrade.owned = 0;
+                    upgrade.cost = upgrade.baseCost;
+                });
+                
+                // Reset activities
+                spicyBoostActive = false;
+                lastSpicyBoost = 0;
+                lastRefill = 0;
+                lastGoldenShower = 0;
+                
+                // Reset managers (but keep them hired)
+                // Reset research (but keep completed research)
+                
+                // Show prestige effect
+                showNotification(`Ascension Complete! Gained ${seedsEarned} Mustard Seeds!`);
+                
+                // Create celebration effect
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(() => {
+                        const bottle = createMustardBottle(Math.random() * 100);
+                        bottle.speed = 200 + Math.random() * 100;
+                        bottle.swingAmount = 5;
+                        bottle.element.style.animation = 'prestigePulse 1s infinite';
+                    }, i * 100);
+                }
+                
+                // Check for achievements
+                achievements.forEach(ach => {
+                    if (ach.type === "ascensions" && totalAscensions >= ach.goal && !ach.unlocked) {
+                        ach.unlocked = true;
+                        const element = document.getElementById(`achievement-${ach.id}`);
+                        element.classList.remove('locked');
+                        element.classList.add(ach.tier);
+                        showNotification(`Achievement Unlocked: ${ach.name}!`);
+                    }
+                });
+                
+                updateUI();
+            }
+        }
+        
+        // Buy prestige upgrade
+        function buyPrestigeUpgrade(index) {
+            let cost = 0;
+            let effect = "";
+            
+            switch(index) {
+                case 1:
+                    cost = 5;
+                    effect = "seedMultiplier";
+                    break;
+                case 2:
+                    cost = 10;
+                    effect = "clickPower";
+                    break;
+                case 3:
+                    cost = 15;
+                    effect = "passiveBoost";
+                    break;
+                case 4:
+                    cost = 20;
+                    effect = "goldenChance";
+                    break;
+                case 5:
+                    cost = 25;
+                    effect = "rainbowDuration";
+                    break;
+            }
+            
+            if (mustardSeeds >= cost) {
+                mustardSeeds -= cost;
+                prestigeUpgrades[effect]++;
+                
+                // Update button
+                const button = document.getElementById(`prestige-upgrade-${index}`);
+                let newCost = 0;
+                
+                switch(index) {
+                    case 1:
+                        newCost = 5 + (prestigeUpgrades.seedMultiplier * 5);
+                        button.textContent = `Buy (Cost: ${newCost})`;
+                        break;
+                    case 2:
+                        newCost = 10 + (prestigeUpgrades.clickPower * 5);
+                        button.textContent = `Buy (Cost: ${newCost})`;
+                        break;
+                    case 3:
+                        newCost = 15 + (prestigeUpgrades.passiveBoost * 5);
+                        button.textContent = `Buy (Cost: ${newCost})`;
+                        break;
+                    case 4:
+                        newCost = 20 + (prestigeUpgrades.goldenChance * 5);
+                        button.textContent = `Buy (Cost: ${newCost})`;
+                        break;
+                    case 5:
+                        newCost = 25 + (prestigeUpgrades.rainbowDuration * 5);
+                        button.textContent = `Buy (Cost: ${newCost})`;
+                        break;
+                }
+                
+                showNotification(`Prestige Upgrade Purchased: ${effect} increased!`);
+                updateUI();
+            }
+        }
+        
+        // Hire a manager
+        function hireManager(type) {
+            let cost = 0;
+            
+            switch(type) {
+                case 'click':
+                    cost = 5000;
+                    break;
+                case 'spicy':
+                    cost = 10000;
+                    break;
+                case 'golden':
+                    cost = 20000;
+                    break;
+            }
+            
+            if (mustard >= cost) {
+                mustard -= cost;
+                managers[type] = true;
+                
+                // Update button
+                const button = document.getElementById(`${type}-manager`);
+                button.disabled = true;
+                button.textContent = "Hired!";
+                
+                showNotification(`Manager Hired! ${type} tasks will now be automated.`);
+                updateUI();
+            }
+        }
+        
+        // Update achievements
+        function updateAchievements() {
+            achievements.forEach(achievement => {
+                const element = document.getElementById(`achievement-${achievement.id}`);
+                const progressBar = document.getElementById(`progress-${achievement.id}`);
+                
+                let current = 0;
+                let goal = achievement.goal;
+                
+                switch(achievement.type) {
+                    case "mustard":
+                        current = mustard;
+                        break;
+                    case "clicks":
+                        current = totalClicks;
+                        break;
+                    case "upgrades":
+                        current = totalUpgrades;
+                        break;
+                    case "specificUpgrade":
+                        current = upgrades[achievement.upgradeIndex].owned;
+                        break;
+                    case "activity":
+                        current = achievement.count;
+                        break;
+                    case "rainbow":
+                        current = achievement.count;
+                        break;
+                    case "ascensions":
+                        current = totalAscensions;
+                        break;
+                    case "research":
+                        current = researchCompleted.length;
+                        break;
+                    case "minigames":
+                        current = achievement.count;
+                        break;
+                    case "events":
+                        current = eventRewards.filter(r => r).length >= 3 ? 1 : 0;
+                        break;
+                }
+                
+                const progress = Math.min(100, (current / goal) * 100);
+                progressBar.style.width = `${progress}%`;
+                
+                if (!achievement.unlocked && current >= goal) {
+                    achievement.unlocked = true;
+                    element.classList.remove('locked');
+                    element.classList.add(achievement.tier);
+                    showNotification(`Achievement Unlocked: ${achievement.name}!`);
+                    
+                    // Special effects for certain achievements
+                    if (achievement.tier === "gold" || achievement.tier === "platinum") {
+                        for (let i = 0; i < 10; i++) {
+                            setTimeout(() => {
+                                const bottle = createMustardBottle(Math.random() * 100);
+                                bottle.speed = 150 + Math.random() * 100;
+                                bottle.swingAmount = 5;
+                            }, i * 200);
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update UI
+        function updateUI() {
+            mustardCountElement.textContent = formatNumber(Math.floor(mustard)) + " Mustard";
+            
+            // Update mustard jar visual
+            const fillPercentage = Math.min(100, Math.floor(mustard) / 2000); // Adjusted for larger numbers
+            mustardLevelElement.style.height = fillPercentage + "%";
+            
+            // Update stats
+            let displayedClickValue = clickValue;
+            if (isRainbowActive) {
+                displayedClickValue = "1000 (RAINBOW!)";
+            } else if (spicyBoostActive) {
+                displayedClickValue = `${clickValue * 2} (2x SPICY!)`;
+            }
+            
+            // Add prestige click bonus
+            if (prestigeUpgrades.clickPower > 0) {
+                displayedClickValue = `${clickValue + prestigeUpgrades.clickPower} (+${prestigeUpgrades.clickPower})`;
+            }
+            
+            clickValueElement.textContent = displayedClickValue;
+            
+            // Apply passive boost from prestige
+            let displayedPassiveRate = passiveRate;
+            if (prestigeUpgrades.passiveBoost > 0) {
+                displayedPassiveRate = passiveRate * (1 + prestigeUpgrades.passiveBoost / 100);
+            }
+            
+            passiveRateElement.textContent = displayedPassiveRate.toFixed(1);
+            totalUpgradesElement.textContent = totalUpgrades;
+            totalClicksElement.textContent = totalClicks;
+            mustardSeedsElement.textContent = mustardSeeds;
+            totalAscensionsElement.textContent = totalAscensions;
+            
+            // Update upgrade button states
+            upgrades.forEach((upgrade, index) => {
+                const button = upgradeButtons[index];
+                if (button) {
+                    let cost = upgrade.cost;
+                    if (researchCompleted.includes(3)) { // Efficient Production
+                        cost = Math.floor(cost * 0.95);
+                    }
+                    button.disabled = mustard < cost;
+                    document.getElementById(`upgrade-cost-${index}`).textContent = formatNumber(cost);
+                    document.getElementById(`upgrade-owned-${index}`).textContent = upgrade.owned;
+                }
+            });
+            
+            // Update activities
+            updateActivities();
+            
+            // Update prestige button
+            prestigeButton.disabled = mustard < 100000;
+            
+            // Update prestige upgrades
+            document.getElementById('prestige-upgrade-1').disabled = mustardSeeds < (5 + (prestigeUpgrades.seedMultiplier * 5));
+            document.getElementById('prestige-upgrade-2').disabled = mustardSeeds < (10 + (prestigeUpgrades.clickPower * 5));
+            document.getElementById('prestige-upgrade-3').disabled = mustardSeeds < (15 + (prestigeUpgrades.passiveBoost * 5));
+            document.getElementById('prestige-upgrade-4').disabled = mustardSeeds < (20 + (prestigeUpgrades.goldenChance * 5));
+            document.getElementById('prestige-upgrade-5').disabled = mustardSeeds < (25 + (prestigeUpgrades.rainbowDuration * 5));
+            
+            // Update research buttons
+            researchData.forEach(research => {
+                if (researchUnlocked.includes(research.id) && !researchCompleted.includes(research.id)) {
+                    const button = document.querySelector(`#research-${research.id} button`);
+                    if (button) {
+                        button.disabled = mustard < research.cost;
+                    }
+                }
+            });
+            
+            // Update manager buttons
+            document.getElementById('click-manager').disabled = mustard < 5000 || managers.click;
+            document.getElementById('spicy-manager').disabled = mustard < 10000 || managers.spicy;
+            document.getElementById('golden-manager').disabled = mustard < 20000 || managers.golden;
+            
+            // Update event progress
+            updateEventProgress();
+            
+            // Update achievements
+            updateAchievements();
+        }
+        
+        // Format large numbers
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+        
+        // Update event progress
+        function updateEventProgress() {
+            // Calculate event progress based on total mustard produced during event
+            const maxProgress = 1000;
+            eventProgress = Math.min(maxProgress, Math.floor(totalMustardProduced / 1000));
+            
+            // Update progress bar
+            eventProgressBar.style.width = `${(eventProgress / maxProgress) * 100}%`;
+            
+            // Update reward status
+            const rewardElements = document.querySelectorAll('.event-reward-status');
+            
+            // Beach Umbrella reward (100 progress)
+            if (eventProgress >= 100 && !eventRewards[0]) {
+                eventRewards[0] = true;
+                rewardElements[0].textContent = "Claimed!";
+                clickValue *= 1.05;
+                showNotification("Event Reward: Beach Umbrella (+5% click power)");
+            }
+            
+            // Ocean Wave reward (250 progress)
+            if (eventProgress >= 250 && !eventRewards[1]) {
+                eventRewards[1] = true;
+                rewardElements[1].textContent = "Claimed!";
+                passiveRate *= 1.1;
+                showNotification("Event Reward: Ocean Wave (+10% passive production)");
+            }
+            
+            // Sunny Day reward (500 progress)
+            if (eventProgress >= 500 && !eventRewards[2]) {
+                eventRewards[2] = true;
+                rewardElements[2].textContent = "Claimed!";
+                clickValue *= 1.15;
+                showNotification("Event Reward: Sunny Day (+15% click power)");
+            }
+            
+            // Update progress text
+            if (!eventRewards[0]) rewardElements[0].textContent = `${eventProgress}/100`;
+            if (!eventRewards[1]) rewardElements[1].textContent = `${eventProgress}/250`;
+            if (!eventRewards[2]) rewardElements[2].textContent = `${eventProgress}/500`;
+            
+            // Update event timer
+            const timeRemaining = eventEndTime - Date.now();
+            const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            eventTimer.textContent = `Event ends in: ${days}d ${hours}h`;
+            
+            // Check if event is complete
+            if (eventRewards.every(r => r)) {
+                achievements.forEach(ach => {
+                    if (ach.type === "events" && !ach.unlocked) {
+                        ach.unlocked = true;
+                        const element = document.getElementById(`achievement-${ach.id}`);
+                        element.classList.remove('locked');
+                        element.classList.add(ach.tier);
+                        showNotification(`Achievement Unlocked: ${ach.name}!`);
+                    }
+                });
+            }
+        }
+        
+        // Memory Match game
+        function startMemoryGame() {
+            memoryGame.active = true;
+            memoryGame.cards = [];
+            memoryGame.flippedCards = [];
+            memoryGame.matchedPairs = 0;
+            
+            // Create card pairs
+            const symbols = ['🌭', '🍔', '🍟', '🌮', '🍕', '🥪', '🥓', '🥩'];
+            let cards = [];
+            
+            symbols.forEach(symbol => {
+                cards.push({ symbol, matched: false });
+                cards.push({ symbol, matched: false });
+            });
+            
+            // Shuffle cards
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            
+            memoryGame.cards = cards;
+            
+            // Create grid
+            memoryGrid.innerHTML = '';
+            cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'memory-card';
+                cardElement.dataset.index = index;
+                cardElement.addEventListener('click', flipCard);
+                memoryGrid.appendChild(cardElement);
+            });
+            
+            memoryScore.textContent = "Matches: 0/8";
+            memoryModal.style.display = 'flex';
+            
+            // Update achievements
+            achievements.forEach(ach => {
+                if (ach.type === "minigames") {
+                    ach.count++;
+                }
+            });
+        }
+        
+        function flipCard() {
+            if (memoryGame.flippedCards.length < 2 && !memoryGame.flippedCards.includes(this.dataset.index)) {
+                const index = parseInt(this.dataset.index);
+                const card = memoryGame.cards[index];
+                
+                if (!card.matched) {
+                    this.textContent = card.symbol;
+                    this.classList.add('flipped');
+                    memoryGame.flippedCards.push(index);
+                    
+                    if (memoryGame.flippedCards.length === 2) {
+                        checkForMatch();
+                    }
+                }
+            }
+        }
+        
+        function checkForMatch() {
+            const [index1, index2] = memoryGame.flippedCards;
+            const card1 = memoryGame.cards[index1];
+            const card2 = memoryGame.cards[index2];
+            
+            if (card1.symbol === card2.symbol) {
+                // Match found
+                card1.matched = true;
+                card2.matched = true;
+                memoryGame.matchedPairs++;
+                
+                document.querySelector(`.memory-card[data-index="${index1}"]`).classList.add('matched');
+                document.querySelector(`.memory-card[data-index="${index2}"]`).classList.add('matched');
+                
+                memoryScore.textContent = `Matches: ${memoryGame.matchedPairs}/8`;
+                
+                // Check if game is complete
+                if (memoryGame.matchedPairs === 8) {
+                    const reward = 500 + (memoryGame.matchedPairs * 100);
+                    mustard += reward;
+                    showNotification(`Memory Match Complete! Earned ${reward} Mustard!`);
+                    setTimeout(closeMemoryGame, 1000);
+                }
+            } else {
+                // No match, flip back after delay
+                setTimeout(() => {
+                    document.querySelector(`.memory-card[data-index="${index1}"]`).textContent = '';
+                    document.querySelector(`.memory-card[data-index="${index2}"]`).textContent = '';
+                    document.querySelector(`.memory-card[data-index="${index1}"]`).classList.remove('flipped');
+                    document.querySelector(`.memory-card[data-index="${index2}"]`).classList.remove('flipped');
+                }, 1000);
+            }
+            
+            memoryGame.flippedCards = [];
+        }
+        
+        function closeMemoryGame() {
+            memoryModal.style.display = 'none';
+            memoryGame.active = false;
+            updateUI();
+        }
+        
+        // Whack-a-Mustard game
+        function startWhackGame() {
+            whackGame.active = true;
+            whackGame.timer = 30;
+            whackGame.score = 0;
+            whackGame.moles = [];
+            
+            // Create grid
+            whackGrid.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'whack-hole';
+                
+                const mole = document.createElement('div');
+                mole.className = 'whack-mole';
+                mole.dataset.index = i;
+                mole.addEventListener('click', whackMole);
+                
+                hole.appendChild(mole);
+                whackGrid.appendChild(hole);
+                whackGame.moles.push({
+                    element: mole,
+                    active: false,
+                    timer: 0
+                });
+            }
+            
+            whackTimer.textContent = `Time: ${whackGame.timer}s`;
+            whackScore.textContent = "Score: 0";
+            whackModal.style.display = 'flex';
+            
+            // Start game timer
+            const gameInterval = setInterval(() => {
+                whackGame.timer--;
+                whackTimer.textContent = `Time: ${whackGame.timer}s`;
+                
+                if (whackGame.timer <= 0) {
+                    clearInterval(gameInterval);
+                    const reward = whackGame.score * 10;
+                    mustard += reward;
+                    showNotification(`Whack-a-Mustard Complete! Earned ${reward} Mustard!`);
+                    setTimeout(closeWhackGame, 1000);
+                }
+            }, 1000);
+            
+            // Start mole popping
+            whackGame.moleInterval = setInterval(popRandomMole, 800);
+            
+            // Update achievements
+            achievements.forEach(ach => {
+                if (ach.type === "minigames") {
+                    ach.count++;
+                }
+            });
+        }
+        
+        function popRandomMole() {
+            if (!whackGame.active) return;
+            
+            const inactiveMoles = whackGame.moles.filter(mole => !mole.active);
+            if (inactiveMoles.length > 0) {
+                const mole = inactiveMoles[Math.floor(Math.random() * inactiveMoles.length)];
+                mole.active = true;
+                mole.element.classList.add('up');
+                
+                // Set timer to hide mole
+                mole.timer = setTimeout(() => {
+                    mole.active = false;
+                    mole.element.classList.remove('up');
+                }, 1500 + Math.random() * 1500);
+            }
+        }
+        
+        function whackMole() {
+            const index = parseInt(this.dataset.index);
+            const mole = whackGame.moles[index];
+            
+            if (mole.active) {
+                clearTimeout(mole.timer);
+                mole.active = false;
+                this.classList.remove('up');
+                whackGame.score++;
+                whackScore.textContent = `Score: ${whackGame.score}`;
+                
+                // Create visual effect
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 100);
+            }
+        }
+        
+        function updateWhackGame() {
+            // This is called from the main game loop when the game is active
+            // Could add additional animations or effects here
+        }
+        
+        function closeWhackGame() {
+            clearInterval(whackGame.moleInterval);
+            whackModal.style.display = 'none';
+            whackGame.active = false;
+            updateUI();
+        }
+        
+        // Mustard Slot Machine
+        function startSlotGame() {
+            slotGame.spinning = false;
+            slotResult.textContent = "Spin to win!";
+            slotSpin.disabled = mustard < 100;
+            slotModal.style.display = 'flex';
+            
+            // Update achievements
+            achievements.forEach(ach => {
+                if (ach.type === "minigames") {
+                    ach.count++;
+                }
+            });
+        }
+        
+        function spinSlots() {
+            if (!slotGame.spinning && mustard >= 100) {
+                mustard -= 100;
+                slotGame.spinning = true;
+                slotSpin.disabled = true;
+                slotResult.textContent = "Spinning...";
+                
+                // Spin each reel
+                const spinDuration = 2000 + Math.random() * 1000;
+                const reels = [];
+                
+                for (let i = 0; i < 3; i++) {
+                    reels[i] = {
+                        spins: 0,
+                        target: Math.floor(Math.random() * slotGame.symbols.length),
+                        element: slotReels[i]
+                    };
+                    
+                    spinReel(reels[i], spinDuration);
+                }
+                
+                // Check results after spinning
+                setTimeout(() => {
+                    slotGame.spinning = false;
+                    checkSlotResults(reels);
+                    slotSpin.disabled = mustard < 100;
+                    updateUI();
+                }, spinDuration + 300);
+            }
+        }
+        
+        function spinReel(reel, duration) {
+            const startTime = performance.now();
+            const spins = 20 + Math.floor(Math.random() * 10);
+            
+            function updateReel(time) {
+                const elapsed = time - startTime;
+                const progress = Math.min(1, elapsed / duration);
+                
+                // Calculate current spin
+                const currentSpin = Math.floor(easeOutCubic(progress) * spins);
+                const symbolIndex = (currentSpin) % slotGame.symbols.length;
+                
+                // Update reel display
+                reel.element.innerHTML = `<div class="slot-symbol">${slotGame.symbols[symbolIndex]}</div>`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateReel);
+                } else {
+                    // Final position
+                    reel.element.innerHTML = `<div class="slot-symbol">${slotGame.symbols[reel.target]}</div>`;
+                }
+            }
+            
+            requestAnimationFrame(updateReel);
+        }
+        
+        function easeOutCubic(t) {
+            return 1 - Math.pow(1 - t, 3);
+        }
+        
+        function checkSlotResults(reels) {
+            const symbols = [
+                slotGame.symbols[reels[0].target],
+                slotGame.symbols[reels[1].target],
+                slotGame.symbols[reels[2].target]
+            ];
+            
+            // Check for wins
+            if (symbols[0] === symbols[1] && symbols[1] === symbols[2]) {
+                // Three of a kind
+                const reward = 1000;
+                mustard += reward;
+                slotResult.textContent = `JACKPOT! Won ${reward} Mustard!`;
+                showNotification(`Slot Jackpot! Won ${reward} Mustard!`);
+            } else if (symbols[0] === symbols[1] || symbols[1] === symbols[2] || symbols[0] === symbols[2]) {
+                // Two of a kind
+                const reward = 200;
+                mustard += reward;
+                slotResult.textContent = `Match! Won ${reward} Mustard!`;
+                showNotification(`Slot Match! Won ${reward} Mustard!`);
+            } else {
+                slotResult.textContent = "No win this time!";
+            }
+        }
+        
+        function closeSlotGame() {
+            slotModal.style.display = 'none';
+            updateUI();
+        }
+        
+        // Show code input modal
+        secretButton.addEventListener('click', () => {
+            codeModal.style.display = 'flex';
+            codeInput.focus();
+        });
+
+        // Close modal
+        closeCode.addEventListener('click', () => {
+            codeModal.style.display = 'none';
+            codeMessage.textContent = '';
+            codeInput.value = '';
+        });
+
+        // Submit code
+        submitCode.addEventListener('click', () => {
+            const code = codeInput.value.trim().toUpperCase();
+            
+            if (code === '') {
+                codeMessage.textContent = 'Please enter a code';
+                codeMessage.style.color = '#8B4513';
+                return;
+            }
+            
+            if (secretCodes[code]) {
+                if (secretCodes[code].used) {
+                    codeMessage.textContent = 'This code has already been used';
+                    codeMessage.style.color = '#8B4513';
+                } else {
+                    secretCodes[code].used = true;
+                    const result = secretCodes[code].effect();
+                    codeMessage.textContent = result;
+                    codeMessage.style.color = '#2E8B57';
+                    updateUI();
+                    setTimeout(() => {
+                        codeModal.style.display = 'none';
+                        codeMessage.textContent = '';
+                        codeInput.value = '';
+                    }, 2000);
+                }
+            } else {
+                codeMessage.textContent = 'Invalid code';
+                codeMessage.style.color = '#B22222';
+            }
+        });
+
+        // Allow pressing Enter to submit
+        codeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitCode.click();
+            }
+        });
+        
+        // Save game functions
+        function saveGame() {
+            const gameData = {
+                mustard,
+                clickValue,
+                passiveRate,
+                totalUpgrades,
+                totalClicks,
+                totalMustardProduced,
+                upgrades,
+                mustardSeeds,
+                totalAscensions,
+                prestigeUpgrades,
+                researchCompleted,
+                researchUnlocked,
+                managers,
+                achievements,
+                eventProgress,
+                eventRewards,
+                eventEndTime
+            };
+            
+            localStorage.setItem('mustardClickerSave', JSON.stringify(gameData));
+            showNotification("Game saved successfully!");
+        }
+        
+        function loadGame() {
+            const savedData = localStorage.getItem('mustardClickerSave');
+            if (savedData) {
+                const gameData = JSON.parse(savedData);
+                
+                mustard = gameData.mustard || 0;
+                clickValue = gameData.clickValue || 1;
+                passiveRate = gameData.passiveRate || 0;
+                totalUpgrades = gameData.totalUpgrades || 0;
+                totalClicks = gameData.totalClicks || 0;
+                totalMustardProduced = gameData.totalMustardProduced || 0;
+                
+                if (gameData.upgrades) {
+                    gameData.upgrades.forEach((savedUpgrade, index) => {
+                        if (upgrades[index]) {
+                            upgrades[index].owned = savedUpgrade.owned || 0;
+                            upgrades[index].cost = savedUpgrade.cost || upgrades[index].baseCost;
+                        }
+                    });
+                }
+                
+                mustardSeeds = gameData.mustardSeeds || 0;
+                totalAscensions = gameData.totalAscensions || 0;
+                prestigeUpgrades = gameData.prestigeUpgrades || {
+                    seedMultiplier: 0,
+                    clickPower: 0,
+                    passiveBoost: 0,
+                    goldenChance: 0,
+                    rainbowDuration: 0
+                };
+                
+                researchCompleted = gameData.researchCompleted || [];
+                researchUnlocked = gameData.researchUnlocked || [];
+                managers = gameData.managers || {
+                    click: false,
+                    spicy: false,
+                    golden: false
+                };
+                
+                if (gameData.achievements) {
+                    gameData.achievements.forEach(savedAchievement => {
+                        const achievement = achievements.find(a => a.id === savedAchievement.id);
+                        if (achievement) {
+                            achievement.unlocked = savedAchievement.unlocked || false;
+                            achievement.count = savedAchievement.count || 0;
+                        }
+                    });
+                }
+                
+                eventProgress = gameData.eventProgress || 0;
+                eventRewards = gameData.eventRewards || [false, false, false];
+                eventEndTime = gameData.eventEndTime || (Date.now() + (7 * 24 * 60 * 60 * 1000));
+                
+                showNotification("Game loaded successfully!");
+                updateUI();
+                initResearch();
+            } else {
+                showNotification("No saved game found!");
+            }
+        }
+        
+        function exportSave() {
+            const gameData = {
+                mustard,
+                clickValue,
+                passiveRate,
+                totalUpgrades,
+                totalClicks,
+                totalMustardProduced,
+                upgrades,
+                mustardSeeds,
+                totalAscensions,
+                prestigeUpgrades,
+                researchCompleted,
+                researchUnlocked,
+                managers,
+                achievements,
+                eventProgress,
+                eventRewards,
+                eventEndTime
+            };
+            
+            const saveString = JSON.stringify(gameData);
+            const blob = new Blob([saveString], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mustard_clicker_save.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification("Save file exported!");
+        }
+        
+        function importSave() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.txt';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = event => {
+                    try {
+                        const gameData = JSON.parse(event.target.result);
+                        
+                        mustard = gameData.mustard || 0;
+                        clickValue = gameData.clickValue || 1;
+                        passiveRate = gameData.passiveRate || 0;
+                        totalUpgrades = gameData.totalUpgrades || 0;
+                        totalClicks = gameData.totalClicks || 0;
+                        totalMustardProduced = gameData.totalMustardProduced || 0;
+                        
+                        if (gameData.upgrades) {
+                            gameData.upgrades.forEach((savedUpgrade, index) => {
+                                if (upgrades[index]) {
+                                    upgrades[index].owned = savedUpgrade.owned || 0;
+                                    upgrades[index].cost = savedUpgrade.cost || upgrades[index].baseCost;
+                                }
+                            });
+                        }
+                        
+                        mustardSeeds = gameData.mustardSeeds || 0;
+                        totalAscensions = gameData.totalAscensions || 0;
+                        prestigeUpgrades = gameData.prestigeUpgrades || {
+                            seedMultiplier: 0,
+                            clickPower: 0,
+                            passiveBoost: 0,
+                            goldenChance: 0,
+                            rainbowDuration: 0
+                        };
+                        
+                        researchCompleted = gameData.researchCompleted || [];
+                        researchUnlocked = gameData.researchUnlocked || [];
+                        managers = gameData.managers || {
+                            click: false,
+                            spicy: false,
+                            golden: false
+                        };
+                        
+                        if (gameData.achievements) {
+                            gameData.achievements.forEach(savedAchievement => {
+                                const achievement = achievements.find(a => a.id === savedAchievement.id);
+                                if (achievement) {
+                                    achievement.unlocked = savedAchievement.unlocked || false;
+                                    achievement.count = savedAchievement.count || 0;
+                                }
+                            });
+                        }
+                        
+                        eventProgress = gameData.eventProgress || 0;
+                        eventRewards = gameData.eventRewards || [false, false, false];
+                        eventEndTime = gameData.eventEndTime || (Date.now() + (7 * 24 * 60 * 60 * 1000));
+                        
+                        showNotification("Save file imported successfully!");
+                        updateUI();
+                        initResearch();
+                    } catch (error) {
+                        showNotification("Invalid save file!");
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+        
+        // Passive income
+        setInterval(() => {
+            let rate = passiveRate;
+            
+            // Apply prestige passive boost
+            if (prestigeUpgrades.passiveBoost > 0) {
+                rate *= (1 + prestigeUpgrades.passiveBoost / 100);
+            }
+            
+            // Apply research boost if available
+            if (researchCompleted.includes(2)) { // Improved Containers
+                rate *= 1.1;
+            }
+            
+            mustard += rate / 10;
+            totalMustardProduced += rate / 10;
+            updateUI();
+        }, 100);
+        
+        // Autosave every 30 seconds
+        setInterval(saveGame, 30000);
+        
+        // Initialize
+        loadGame(); // Try to load saved game first
+        updateUI();
+        startMustardRain();
+        initResearch();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            bottles.forEach(bottle => {
+                if (bottle.y > window.innerHeight) {
+                    bottle.element.remove();
+                    bottles = bottles.filter(b => b !== bottle);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
